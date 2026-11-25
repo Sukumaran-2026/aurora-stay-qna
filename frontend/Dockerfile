@@ -8,11 +8,11 @@ WORKDIR /app
 # Copy all files from the current directory to the container's /app directory
 COPY . .
 
-# Upgrade pip
-RUN pip install --no-cache-dir --upgrade pip
+# Upgrade pip with higher timeouts and retries to prevent connection failures in Codespaces
+RUN pip install --no-cache-dir --upgrade pip --default-timeout=100 --retries 5
 
 # Install Python dependencies listed in requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --default-timeout=100 --retries 5
 
 # Run the Streamlit application on port 8501
 # 0.0.0.0 makes the application accessible outside the container
