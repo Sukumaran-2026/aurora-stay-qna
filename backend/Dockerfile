@@ -1,22 +1,16 @@
-
 FROM python:3.13.15-slim
 
 WORKDIR /app
-RUN echo "precedence ::ffff:0:0/96  100" >> /etc/gai.conf
-COPY . .
 
-# Configure pip timeouts and retries globally using environment variables
-ENV PIP_DEFAULT_TIMEOUT=100
-ENV PIP_RETRIES=5
+COPY requirements.txt .
 
-RUN pip install --no-cache-dir --upgrade pip 
-
-RUN pip install --no-cache-dir --default-timeout=100 --retries=5 \
+RUN --mount=type=bind,source=wheels,target=/tmp/wheels \
+    pip install --no-cache-dir --no-index --find-links=/tmp/wheels \
     torch \
-    --index-url https://download.pytorch.org/whl/cpu
+    -r requirements.txt
 
-    
-RUN pip install --no-cache-dir -r requirements.txt
+COPY app.py rag*.py ./
+COPY faiss_index ./faiss_index
 
 ENV HF_HOME=/app/huggingface
 
